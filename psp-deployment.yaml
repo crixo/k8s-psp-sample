@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: qrcoderunasnonroot
+  name: qrcoderunasnonroot
+  namespace: psp-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qrcoderunasnonroot
+  template:
+    metadata:
+      labels:
+        app: qrcoderunasnonroot
+    spec:
+      #serviceAccountName: fake-user
+      containers:
+      - image: samwierema/go-qr-generator:latest
+        imagePullPolicy: Always
+        name: qrcode
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        securityContext:
+          #runAsUser: 1000
+          runAsNonRoot: true
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+  name: qrcoderunasnonroot
+  namespace: psp-example
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: qrcoderunasnonroot
