@@ -17,3 +17,21 @@ kubectl-admin get rolebindings -o json | jq -r '
     [.kind,.namespace,.name] == ["ServiceAccount","kube-system","node-controller"]
   ) |
   .metadata.name'
+
+## How to enable admission controllers plugins
+https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#how-do-i-turn-on-an-admission-control-plug-in
+
+on the master node
+```
+sudo vim /etc/kubernetes/manifests/kube-apiserver.yaml
+```
+
+add **PodSecurityPolicy** as plugin
+```
+- --enable-admission-plugins=NodeRestriction,PodSecurityPolicy
+```
+
+get list of admission controllers enabled plugins
+```
+kubectl describe pod kube-apiserver-master-1 -n kube-system
+```
